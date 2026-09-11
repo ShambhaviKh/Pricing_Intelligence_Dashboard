@@ -1,0 +1,674 @@
+---
+title: "eda lenovo"
+output:
+  html_document: default
+  pdf_document: default
+date: "2026-09-08"
+---
+
+## Executive Summary
+
+This EDA covers 14 fiscal quarters (FY24Q1–FY27Q2) of Lenovo transaction data
+(~11.7M rows across Invoice, Return, Order, and Warranty Service documents).
+Key takeaways, expanded on in-line below:
+
+- **Revenue base**: ~$4.94B in shipped-invoice revenue across the window, growing
+  from ~$316M/quarter (FY24Q1) to a peak of ~$458M/quarter (FY26Q2), with blended
+  margin improving from ~13-15% early on to 20-24% in FY26-FY27.
+- **FY26Q3 looks like a data completeness issue, not a real demand shock**: revenue
+  drops ~79% quarter-over-quarter and rebounds +354% the following quarter, while
+  total row volume for that quarter is roughly half of neighboring quarters. Treat
+  FY26Q3 (and any trend line crossing it) with caution until this is confirmed with
+  the data owner.
+- **FY27Q1 has no usable `order_date`** (min/max both `NA`), even though the quarter
+  otherwise has revenue and transaction counts — a data quality gap worth flagging
+  before doing any date-based analysis on that quarter.
+- **Concentration risk**: Enterprise segment drives ~75% of revenue; Direct channel
+  drives ~92%. Both carry healthy margins (22.8% and 20.2% respectively), while
+  Marketplace and Clearance channels run *negative* margin.
+- **Nearly half of all shipped invoice line items (44.8%) show negative margin**,
+  even though the aggregate quarterly margin is comfortably positive — this is
+  consistent with promotional pricing / bundled discounting at the line level, but
+  worth a closer look if margin leakage is a concern.
+- **Returns run a fairly stable 2-3% of units and 3-5% of revenue** per quarter,
+  with the two biggest named reasons — product quality issues and customer
+  satisfaction — together accounting for ~47% of all coded returns.
+- **Cancellations are mostly customer-initiated** (52% of coded reasons), with
+  another third attributable to internal/system processing rather than genuine
+  demand loss.
+
+## Reading in the data
+
+```{r setup}
+
+library(tidyverse)
+library(data.table)
+
+FY24Q1 <- fread("synthesized_FY24Q1.csv")
+FY24Q2 <- fread("synthesized_FY24Q2.csv")
+FY24Q3 <- fread("synthesized_FY24Q3.csv")
+FY24Q4 <- fread("synthesized_FY24Q4.csv")
+
+FY25Q1 <- fread("synthesized_FY25Q1.csv")
+FY25Q2 <- fread("synthesized_FY25Q2.csv")
+FY25Q3 <- fread("synthesized_FY25Q3.csv")
+FY25Q4 <- fread("synthesized_FY25Q4.csv")
+
+FY26Q1 <- fread("synthesized_FY26Q1.csv")
+FY26Q2 <- fread("synthesized_FY26Q2.csv")
+FY26Q3 <- fread("synthesized_FY26Q3.csv")
+FY26Q4 <- fread("synthesized_FY26Q4.csv")
+
+FY27Q1 <- fread("synthesized_FY27Q1.csv")
+FY27Q2 <- fread("synthesized_FY27Q2.csv")
+
+
+
+date_cols <- c(
+  "order_date",
+  "return_date",
+  "ship_date",
+  "week_begin"
+)
+
+tables <- list(
+  FY24Q1 = FY24Q1,
+  FY24Q2 = FY24Q2,
+  FY24Q3 = FY24Q3,
+  FY24Q4 = FY24Q4,
+  FY25Q1 = FY25Q1,
+  FY25Q2 = FY25Q2,
+  FY25Q3 = FY25Q3,
+  FY25Q4 = FY25Q4,
+  FY26Q1 = FY26Q1,
+  FY26Q2 = FY26Q2,
+  FY26Q3 = FY26Q3,
+  FY26Q4 = FY26Q4,
+  FY27Q1 = FY27Q1,
+  FY27Q2 = FY27Q2
+)
+```
+
+Fourteen quarterly extracts (FY24Q1 through FY27Q2) are read in and staged for a
+single combined table. Date columns are coerced to character first since `fread()`
+may infer slightly different types per file, which would otherwise break
+`rbindlist()`.
+
+## Tables
+
+
+```{r}
+
+# Make date columns the same type in every dataset
+tables <- lapply(tables, function(x) {
+  x[, (date_cols) := lapply(.SD, as.character),
+    .SDcols = date_cols]
+  x
+})
+
+# Combine everything + create quarter column
+all_data <- rbindlist(
+  tables,
+  use.names = TRUE,
+  fill = TRUE,
+  idcol = "quarter"
+)
+
+
+
+
+# Number of rows and columns
+dim(all_data)
+
+# Column names
+names(all_data)
+
+# Structure / data types
+str(all_data)
+
+# First few rows
+head(all_data)
+
+# Summary of all variables
+summary(all_data)
+```
+
+The combined table lands at **11,738,282 rows × 36 columns**. `summary()` confirms
+the shape of the data: `order_units`, `revenue`, `cost`, and `margin` all have
+**negative minimums** (down to roughly -$228K revenue and -$768K margin on a single
+row), which is expected once returns and credit memos are mixed in with shipments —
+but it's a reminder that `document_type` and `order_status` need to be filtered
+before treating `sum(revenue)` as "sales."
+
+```{r missingness}
+# Number of missing values in each column
+colSums(is.na(all_data))
+
+round(colMeans(is.na(all_data)) * 100, 2)
+
+sort(colMeans(is.na(all_data)) * 100, decreasing = TRUE)
+
+table(all_data$quarter)
+
+all_data[, order_date := as.IDate(order_date)]
+all_data[, return_date := as.IDate(return_date)]
+all_data[, ship_date := as.IDate(ship_date)]
+all_data[, week_begin := as.IDate(week_begin)]
+
+str(all_data[, .(
+  order_date,
+  return_date,
+  ship_date,
+  week_begin
+)])
+all_data[, .(
+  min_order_date = min(order_date, na.rm = TRUE),
+  max_order_date = max(order_date, na.rm = TRUE),
+  min_week = min(week_begin, na.rm = TRUE),
+  max_week = max(week_begin, na.rm = TRUE)
+)]
+```
+
+**Missingness**: `return_date` is missing for 91.5% of rows, but that's expected —
+only `Return` document rows carry a return date, and returns are ~2.4% of all
+rows. `city` is missing for 12.0% of rows, `tax` for 8.6%, and
+`invoice_quantity`/`invoice_revenue_country_currency` for 5.1% each (these two
+track together, consistent with being populated from the same invoicing source
+system). None of these look alarming on their own.
+
+**Date range**: order dates span 2023-04-01 to 2026-08-29, and `week_begin` spans
+2023-03-27 to 2026-11-16 — the week column runs further into the future, which
+makes sense if it reflects a forecast/scheduling week rather than a transaction
+date.
+
+```{r doc-types}
+# How many rows of each document type?
+all_data[, .N, by = document_type][order(-N)]
+
+# Document categories within each document type
+all_data[, .N, by = .(
+  document_type,
+  document_category
+)][order(document_type, -N)]
+
+# Order statuses
+all_data[, .N, by = order_status][order(-N)]
+
+all_data[, .N, by = .(
+  document_type,
+  order_status
+)][order(document_type, -N)]
+
+all_data[, .(
+  rows = .N,
+  total_units = sum(order_units, na.rm = TRUE),
+  total_revenue = sum(revenue, na.rm = TRUE),
+  total_invoice_qty = sum(invoice_quantity, na.rm = TRUE),
+  total_invoice_revenue = sum(invoice_revenue_country_currency, na.rm = TRUE),
+  total_cost = sum(cost, na.rm = TRUE),
+  total_margin = sum(margin, na.rm = TRUE)
+), by = document_type]
+```
+
+Of the four document types, `Invoice` dominates volume (11.29M rows, 96.2% of the
+table) and is the only type with meaningfully positive aggregate revenue and
+margin ($5.29B revenue / $1.18B margin). `Return` rows are naturally negative
+(-$202.3M revenue, -$34.9M margin) since they reverse prior sales. `Order` rows —
+mostly cancellations and return-order placeholders — carry $122.2M in nominal
+revenue but a **negative** $21.0M margin, which tracks with cancelled orders
+often being high-cost, low-completion transactions. `order_status` splits out
+similarly: `SHIPS` is 94.2% of rows, `Cancel` 3.0%, `RET` 2.4%, and `BCK`
+(backorder) 0.4%.
+
+```{r quarter-consistency}
+quarter_check <- all_data[, .N,
+                          by = .(quarter, quarter_fiscal)
+][order(quarter, quarter_fiscal)]
+
+quarter_check
+
+
+all_data[, .(
+  min_order_date = min(order_date, na.rm = TRUE),
+  max_order_date = max(order_date, na.rm = TRUE),
+  min_week = min(week_begin, na.rm = TRUE),
+  max_week = max(week_begin, na.rm = TRUE)
+), by = quarter][order(quarter)]
+```
+
+`quarter` (the file/extract a row came from) and `quarter_fiscal` (the fiscal
+quarter assigned to the transaction) mostly agree, but every extract has a
+"tail" of rows tagged to a *different* fiscal quarter — typically 2-5% of that
+quarter's rows bleeding into the next one or two fiscal periods. That's a normal
+pattern for late-processed invoices, returns, and backorders and doesn't need
+fixing, but any quarter-level KPI should decide up front whether it wants
+`quarter` (extract-based) or `quarter_fiscal` (transaction-based) as its grouping
+key — they are not interchangeable.
+
+**Data quality flag — FY27Q1**: the per-quarter date-range check shows
+`min_order_date`/`max_order_date` as `NA` for FY27Q1, even though that extract
+has 729,657 rows and shows up with real transactions and revenue elsewhere in
+this notebook. `order_date` appears to be entirely unpopulated for this one
+quarter. Any analysis that filters or trends on `order_date` will silently drop
+FY27Q1 — worth confirming with the data source before relying on it.
+
+```{r return-completeness}
+all_data[, .(
+  total_rows = .N,
+  has_return_date = sum(!is.na(return_date)),
+  has_return_reason = sum(reason_of_return != "" & !is.na(reason_of_return))
+), by = document_type]
+
+all_data[reason_of_return != "",
+         .N,
+         by = reason_of_return][order(-N)]
+all_data[reason_of_cancel != "",
+         .N,
+         by = reason_of_cancel][order(-N)]
+```
+
+Return reasons are recorded for essentially all `Return` rows (281,341 of
+281,598, or 99.9%). The top three coded reasons — *product quality issue*
+(66,529), *customer satisfaction* (65,461), and *unauthorized* (51,960) —
+together make up about 65% of all coded returns. Cancel reasons tell a
+different story: over half (52.3%) are customer-initiated cancellations, with
+another third split between system-assigned cancellations (25.5%) and system
+errors (8.7%) — i.e. roughly a third of cancellations are process/system driven
+rather than a customer changing their mind.
+
+```{r negative-value-checks}
+all_data[, .(
+  rows = .N,
+  negative_revenue = sum(revenue < 0, na.rm = TRUE),
+  negative_units = sum(order_units < 0, na.rm = TRUE),
+  negative_margin = sum(margin < 0, na.rm = TRUE)
+), by = document_type]
+
+all_data[revenue < 0,
+         .N,
+         by = .(document_type, document_category)][order(-N)]
+```
+
+Negative revenue is almost entirely confined to `Return` rows (93.6% of returns
+have negative revenue — the rest are likely $0-value or goodwill-adjustment
+returns). The more interesting number is **negative margin on `Invoice` rows**:
+5,061,793 of 11,290,381 invoice rows (44.8%) book a negative margin at the line
+level, even though invoices are net-positive in aggregate. That's consistent
+with heavy per-line discounting, bundling, or promotional pricing that gets
+made up elsewhere in the order — but it's a large enough share that it's worth
+a follow-up look if margin leakage at the SKU/line level is a concern.
+
+## seperating into 3 dfs
+
+```{r }
+# Sales / invoice data
+sales_data <- all_data[
+  document_type == "Invoice" &
+    order_status == "SHIPS"
+]
+
+# Return data
+return_data <- all_data[
+  document_type == "Return"
+]
+
+# Cancelled transactions
+cancel_data <- all_data[
+  order_status == "Cancel"
+]
+```
+
+Three working datasets are carved out for the rest of the analysis:
+`sales_data` (shipped invoices only — the cleanest "actual sales" view),
+`return_data` (all Return-type rows), and `cancel_data` (any row with
+`order_status == "Cancel"`, regardless of document type). Note `cancel_data`
+is a superset across document types, so it isn't directly comparable
+row-for-row with `sales_data`/`return_data`.
+
+```{r quarter-sales}
+quarter_sales <- sales_data[, .(
+  transactions = .N,
+  units = sum(order_units, na.rm = TRUE),
+  revenue = sum(revenue, na.rm = TRUE),
+  cost = sum(cost, na.rm = TRUE),
+  margin = sum(margin, na.rm = TRUE)
+), by = quarter][order(quarter)]
+
+quarter_sales
+
+quarter_sales[, margin_pct := margin / revenue * 100]
+
+quarter_sales
+
+quarter_sales[, revenue_growth_pct :=
+                (revenue / shift(revenue) - 1) * 100]
+
+quarter_sales[, units_growth_pct :=
+                (units / shift(units) - 1) * 100]
+
+quarter_sales
+```
+
+Shipped-invoice revenue climbs from $315.9M (FY24Q1) to a series high of
+$457.6M (FY26Q2), with margin_pct improving steadily from the 13-15% range in
+FY24 to 20-24% by FY26-FY27 — the business is not just growing but growing at
+better unit economics. The one clear outlier is **FY26Q3**: revenue falls to
+$96.7M (a 78.9% quarter-over-quarter drop) and units fall 67.5%, then both
+snap back the very next quarter (+354.0% revenue, +173.5% units) to land
+roughly back on trend. A swing of that size and shape — a single-quarter crater
+with an immediate, near-complete recovery — is much more consistent with a
+partial or delayed data load for FY26Q3 than an actual demand shock, especially
+since margin_pct for that quarter (20.25%) stayed in line with neighboring
+quarters rather than moving with the revenue collapse. This is worth confirming
+before FY26Q3 is used in any trend or forecast.
+
+## plots
+
+```{r}
+library(ggplot2)
+
+ggplot(
+  quarter_sales,
+  aes(x = quarter, y = revenue, group = 1)
+) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Revenue by Quarter",
+    x = "Quarter",
+    y = "Revenue"
+  ) +
+  theme_minimal()
+```
+
+
+```{r}
+ggplot(
+  quarter_sales,
+  aes(x = quarter, y = margin_pct, group = 1)
+) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Margin % by Quarter",
+    x = "Quarter",
+    y = "Margin %"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+ggplot(
+  quarter_sales,
+  aes(x = quarter, y = units, group = 1)
+) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Units Sold by Quarter",
+    x = "Quarter",
+    y = "Units"
+  ) +
+  theme_minimal()
+
+```
+
+All three series — revenue, margin %, and units — visibly show the same
+FY26Q3 dip-and-rebound pattern flagged above. Setting that quarter aside, the
+underlying shape is a business with two mild seasonal "waves" (dips at
+FY24Q1/FY24Q4/FY25Q1 and again at FY25Q4/FY26Q1) riding on top of a positive
+margin trend.
+
+# revenue
+
+```{r}
+product_type_summary <- sales_data[, .(
+  units = sum(order_units, na.rm = TRUE),
+  revenue = sum(revenue, na.rm = TRUE),
+  margin = sum(margin, na.rm = TRUE)
+), by = product_type]
+
+product_type_summary[, margin_pct := margin / revenue * 100]
+
+product_type_summary[order(-revenue)]
+```
+
+Notebooks are the single largest product type by revenue ($2.85B, ~58% of
+total sales revenue) at a 16.6% margin, followed by Workstations ($1.04B,
+16.9% margin) and Desktop ($420M, but a much thinner 9.7% margin). Services
+stand out on margin (63.7%), though its revenue base is small ($246M).
+`Shipping` is the only meaningful category with a **negative** margin_pct
+(-21.9%) — expected if it's a pass-through/fee line rather than a real
+product, but worth excluding from any "most profitable product" ranking.
+
+```{r}
+product_family_summary <- sales_data[, .(
+  units = sum(order_units, na.rm = TRUE),
+  revenue = sum(revenue, na.rm = TRUE),
+  margin = sum(margin, na.rm = TRUE)
+), by = product_family]
+
+product_family_summary[, margin_pct := margin / revenue * 100]
+
+product_family_summary[order(-revenue)]
+```
+
+At the family level, "Frame Road" leads revenue ($1.40B) and does it at a
+strong 26.0% margin — the best combination of scale and profitability in the
+portfolio. A handful of smaller families run negative margin (`Lantern Orbit`
+-8.3%, `Portal Bridge` -1.2%, `Signal Road` -17.4%, `Fusion Echo` -21.9%),
+which is worth a closer look since a negative-margin product family, unlike a
+negative-margin quarter, isn't self-correcting on its own.
+
+```{r}
+segment_summary <- sales_data[, .(
+  units = sum(order_units, na.rm = TRUE),
+  revenue = sum(revenue, na.rm = TRUE),
+  margin = sum(margin, na.rm = TRUE)
+), by = segment]
+
+segment_summary[, margin_pct := margin / revenue * 100]
+
+segment_summary[order(-revenue)]
+```
+
+Enterprise is the dominant segment: 75.0% of revenue ($3.73B) at a healthy
+22.8% margin. Personal is meaningfully lower-margin (7.2% on $1.27B revenue),
+and Partner Channel is small but margin-negative (-17.2% on $46.3M). This is a
+concentration worth naming explicitly: three-quarters of revenue rides on one
+segment.
+
+```{r}
+channel_summary <- sales_data[, .(
+  units = sum(order_units, na.rm = TRUE),
+  revenue = sum(revenue, na.rm = TRUE),
+  margin = sum(margin, na.rm = TRUE)
+), by = sales_channel]
+
+channel_summary[, margin_pct := margin / revenue * 100]
+
+channel_summary[order(-revenue)]
+```
+
+Direct is by far the largest channel (91.6% of revenue, $4.52B, 20.2% margin).
+Two smaller channels run negative margin — Marketplace (-6.0% on $120.4M) and
+Clearance (-26.8%, though on a tiny $16K base) — which makes sense for a
+clearance channel but is a flag worth watching for Marketplace given its
+larger size.
+
+# returns
+
+```{r}
+quarter_returns <- return_data[, .(
+  return_rows = .N,
+  returned_units = abs(sum(order_units, na.rm = TRUE)),
+  return_value = abs(sum(revenue, na.rm = TRUE))
+), by = quarter][order(quarter)]
+
+quarter_returns
+```
+
+```{r}
+quarter_performance <- merge(
+  quarter_sales,
+  quarter_returns,
+  by = "quarter",
+  all.x = TRUE
+)
+```
+
+```{r}
+quarter_performance[, unit_return_rate :=
+                      returned_units / units * 100]
+
+quarter_performance[, revenue_return_rate :=
+                      return_value / revenue * 100]
+
+quarter_performance
+```
+
+Unit return rates hold in a narrow 1.6-2.9% band across all 14 quarters, and
+revenue return rates run 2.4-4.7% — with one exception: **FY26Q3**, the same
+quarter flagged earlier for its revenue anomaly, spikes to a 6.55% revenue
+return rate, the highest in the series. That's consistent with the same data
+completeness issue (a smaller denominator of shipped revenue inflates the
+return rate) rather than a genuine spike in returns, since `return_value`
+itself ($6.3M) is actually the lowest in the whole series for that quarter.
+Encouragingly, the two most recent quarters (FY27Q1: 1.95%/3.04%, FY27Q2:
+1.61%/2.40%) show the lowest return rates on record.
+
+## cancellations
+
+```{r}
+cancel_reasons <- cancel_data[
+  reason_of_cancel != "",
+  .N,
+  by = reason_of_cancel
+][order(-N)]
+
+cancel_reasons
+
+```
+
+This confirms the pattern noted earlier: customer-request cancellations
+(184,693, 52.3%) are the single largest bucket, with system-assigned
+(89,988, 25.5%) and "Others" (35,695, 10.1%) rounding out most of the rest. The
+long tail of granular reasons (fraud review, failed authorization, insufficient
+inventory, etc.) each account for well under 1.5% of cancellations individually.
+
+```{r}
+quarter_cancels <- cancel_data[, .N, by = quarter][order(quarter)]
+
+quarter_cancels
+
+ggplot(
+  quarter_cancels,
+  aes(x = quarter, y = N, group = 1)
+) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Cancellations by Quarter",
+    x = "Quarter",
+    y = "Cancelled rows"
+  ) +
+  theme_minimal()
+```
+
+## Additional analyses
+
+The sections below extend the original notebook with a few follow-up cuts
+that fell out of the findings above: cancellation rate normalized against
+volume, the specific products driving revenue, and a year-over-year roll-up.
+These weren't run in this session (no R runtime / source CSVs were available
+here — analysis above is written directly from the output you shared), so
+review the results when you knit this yourself.
+
+### Cancellation rate (normalized), not just cancellation count
+
+Raw cancellation counts mix in overall volume changes; dividing by that
+quarter's total rows gives a comparable rate across quarters.
+
+```{r cancel-rate}
+quarter_totals <- all_data[, .(total_rows = .N), by = quarter]
+
+quarter_cancel_rate <- merge(
+  quarter_cancels,
+  quarter_totals,
+  by = "quarter"
+)
+
+quarter_cancel_rate[, cancel_rate_pct := N / total_rows * 100]
+quarter_cancel_rate[order(quarter)]
+
+ggplot(
+  quarter_cancel_rate,
+  aes(x = quarter, y = cancel_rate_pct, group = 1)
+) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Cancellation Rate by Quarter (% of all rows)",
+    x = "Quarter",
+    y = "Cancellation rate (%)"
+  ) +
+  theme_minimal()
+```
+
+### Top 10 products by revenue
+
+`product_type` and `product_family` are useful for a portfolio-level view, but
+it's often more actionable to know the specific top SKUs.
+
+```{r top-products}
+top_products <- sales_data[, .(
+  units = sum(order_units, na.rm = TRUE),
+  revenue = sum(revenue, na.rm = TRUE),
+  margin = sum(margin, na.rm = TRUE)
+), by = .(product_id, product_name)]
+
+top_products[, margin_pct := margin / revenue * 100]
+
+top_products[order(-revenue)][1:10]
+```
+
+### Year-over-year roll-up
+
+Rolling the 14 quarterly extracts up to a fiscal-year level makes the
+FY24 → FY27 trajectory easier to read than the quarter-by-quarter table,
+and smooths out single-quarter anomalies like FY26Q3.
+
+```{r yoy-rollup}
+quarter_sales[, fiscal_year := substr(quarter, 1, 4)]
+
+fy_sales <- quarter_sales[, .(
+  quarters_in_extract = .N,
+  units = sum(units, na.rm = TRUE),
+  revenue = sum(revenue, na.rm = TRUE),
+  margin = sum(margin, na.rm = TRUE)
+), by = fiscal_year][order(fiscal_year)]
+
+fy_sales[, margin_pct := margin / revenue * 100]
+
+fy_sales
+```
+
+Note FY24 and FY27 are partial in this extract (FY24 is missing nothing here
+since all 4 quarters are present, but **FY27 only has Q1-Q2**), so compare
+FY27 to the *first two quarters* of prior years rather than to a full-year
+total.
+
+### Negative-margin invoice lines, by product type
+
+Earlier we found 44.8% of shipped-invoice line items book a negative margin.
+Breaking that down by `product_type` shows whether it's concentrated in a
+few categories (e.g. promo-heavy lines) or spread evenly across the
+portfolio.
+
+```{r negative-margin-by-type}
+sales_data[, .(
+  rows = .N,
+  negative_margin_rows = sum(margin < 0, na.rm = TRUE),
+  negative_margin_pct = round(sum(margin < 0, na.rm = TRUE) / .N * 100, 1)
+), by = product_type][order(-negative_margin_pct)]
+```
