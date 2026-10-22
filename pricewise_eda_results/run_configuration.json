@@ -1,0 +1,32 @@
+{
+  "input_files": [
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY24Q1.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY24Q2.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY24Q3.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY24Q4.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY25Q1.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY25Q2.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY25Q3.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY25Q4.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY26Q1.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY26Q2.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY26Q3.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY26Q4.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY27Q1.csv",
+    "/Users/shambhavikhanna/Downloads/Capstone/Data/synthesized_FY27Q2.csv"
+  ],
+  "segments": [
+    "enterprise"
+  ],
+  "revenue_column": "revenue",
+  "country_partitioned": true,
+  "as_of_override": null,
+  "top_n": 30,
+  "top_families": 5,
+  "products_per_family": 6,
+  "readiness": {
+    "min_30d_transactions": 10,
+    "min_30d_active_days": 5,
+    "max_recency_days": 14
+  }
+}

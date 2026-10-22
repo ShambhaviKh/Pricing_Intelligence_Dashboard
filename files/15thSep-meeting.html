@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Intelligence Dashboard - Business Scope Toolkit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #e8f4f8 50%, #f0ede8 100%);
+            color: #5a5a5a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #d4a5f8 0%, #a8d8f8 50%, #d4c5f8 100%);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(212, 165, 248, 0.2);
+        }
+
+        .header h1 {
+            color: #6b4c9a;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #5a5a5a;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: #e8d4f8;
+            color: #6b4c9a;
+            box-shadow: 0 4px 10px rgba(212, 165, 248, 0.2);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(212, 165, 248, 0.3);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #d4a5f8, #a8d8f8);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(212, 165, 248, 0.15);
+            border-left: 5px solid #d4a5f8;
+        }
+
+        .card.pastel-blue {
+            border-left-color: #a8d8f8;
+            background: linear-gradient(135deg, #f5fafe 0%, #ffffff 100%);
+        }
+
+        .card.pastel-pink {
+            border-left-color: #f8b8d4;
+            background: linear-gradient(135deg, #fffaf8 0%, #ffffff 100%);
+        }
+
+        .card.pastel-green {
+            border-left-color: #c5f0d4;
+            background: linear-gradient(135deg, #f8fffe 0%, #ffffff 100%);
+        }
+
+        .card.pastel-yellow {
+            border-left-color: #f8e8b8;
+            background: linear-gradient(135deg, #fffef8 0%, #ffffff 100%);
+        }
+
+        h2 {
+            color: #6b4c9a;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            color: #8b6ba8;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        .section-intro {
+            background: linear-gradient(135deg, #f0e8f8, #e8f4f8);
+            border-left: 4px solid #d4a5f8;
+            padding: 18px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #5a5a5a;
+        }
+
+        .agenda-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .agenda-item {
+            background: linear-gradient(135deg, #e8d4f8, #d4e8f8);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #d4a5f8;
+        }
+
+        .agenda-item-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #d4a5f8;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .agenda-item h4 {
+            color: #6b4c9a;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .agenda-item ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .agenda-item li {
+            color: #5a5a5a;
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .agenda-item li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #a8d8f8;
+            font-weight: bold;
+        }
+
+        .column-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .column-box {
+            background: linear-gradient(135deg, #f5fafe, #ffffff);
+            border: 2px solid #a8d8f8;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .column-name {
+            font-weight: 700;
+            color: #6b4c9a;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .column-type {
+            font-size: 0.85em;
+            color: #a8a8a8;
+            margin-bottom: 8px;
+        }
+
+        .column-usage {
+            font-size: 0.9em;
+            color: #5a5a5a;
+            font-style: italic;
+        }
+
+        .price-components {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .price-comp-card {
+            background: linear-gradient(135deg, #fffaf8, #fff5fa);
+            border: 2px solid #f8b8d4;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .price-comp-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .price-comp-title {
+            font-weight: 700;
+            color: #d4599a;
+            margin-bottom: 10px;
+        }
+
+        .price-comp-desc {
+            font-size: 0.95em;
+            color: #5a5a5a;
+        }
+
+        .objective-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .objective-card {
+            background: linear-gradient(135deg, #f8fffe, #f5fffb);
+            border: 3px solid #c5f0d4;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .objective-title {
+            font-weight: 700;
+            color: #4a9b6f;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .objective-item {
+            color: #5a5a5a;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .objective-item strong {
+            color: #4a9b6f;
+        }
+
+        .metric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        .metric-table th {
+            background: linear-gradient(135deg, #d4a5f8, #a8d8f8);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .metric-table td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #e8d4f8;
+        }
+
+        .metric-table tr:nth-child(even) {
+            background: #f8f5fe;
+        }
+
+        .metric-table tr:hover {
+            background: #efe8f8;
+        }
+
+        .key-points {
+            background: linear-gradient(135deg, #fffef8, #fffffc);
+            border-left: 4px solid #f8e8b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .key-points h4 {
+            color: #b8984d;
+            margin-bottom: 12px;
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            color: #5a5a5a;
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .key-points li::before {
+            content: "★";
+            position: absolute;
+            left: 0;
+            color: #f8e8b8;
+            font-size: 1.2em;
+        }
+
+        .decision-box {
+            background: linear-gradient(135deg, #f0e8f8, #e8f4f8);
+            border: 2px dashed #d4a5f8;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .decision-box h4 {
+            color: #6b4c9a;
+            margin-bottom: 15px;
+        }
+
+        .trend-box {
+            background: linear-gradient(135deg, #f8f5fe, #f5fafe);
+            border-left: 4px solid #a8d8f8;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .trend-title {
+            font-weight: 700;
+            color: #6b6ba8;
+            margin-bottom: 10px;
+        }
+
+        .trend-finding {
+            color: #5a5a5a;
+            margin: 8px 0;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .comparison-card {
+            background: linear-gradient(135deg, #fffef8, #ffffff);
+            border: 2px solid #f8e8b8;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .comparison-card h4 {
+            color: #b8984d;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .pro {
+            background: #f0ffe8;
+            border-left: 3px solid #90c890;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .con {
+            background: #ffe8e8;
+            border-left: 3px solid #d89090;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .pro::before {
+            content: "✓ ";
+            color: #4a9b6f;
+            font-weight: bold;
+        }
+
+        .con::before {
+            content: "✗ ";
+            color: #9b4a4a;
+            font-weight: bold;
+        }
+
+        .data-prep {
+            background: linear-gradient(135deg, #f5fffb, #f0fffe);
+            border: 2px solid #c5f0d4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .data-prep-title {
+            font-weight: 700;
+            color: #4a9b6f;
+            margin-bottom: 12px;
+        }
+
+        .data-prep-item {
+            margin: 10px 0;
+            color: #5a5a5a;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .data-prep-item::before {
+            content: "→";
+            position: absolute;
+            left: 5px;
+            color: #c5f0d4;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #a8a8a8;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .agenda-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .column-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .price-components {
+                grid-template-columns: 1fr;
+            }
+
+            .objective-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Pricing Intelligence Dashboard</h1>
+            <p>Business Scope Definition Toolkit for Meeting Alignment</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'agenda')">📋 Meeting Agenda</button>
+            <button class="tab-btn" onclick="switchTab(event, 'columns')">📋 Data Columns</button>
+            <button class="tab-btn" onclick="switchTab(event, 'price')">💰 Price Components</button>
+            <button class="tab-btn" onclick="switchTab(event, 'optimize')">🎯 Optimization Targets</button>
+            <button class="tab-btn" onclick="switchTab(event, 'trends')">📈 Trends & Correlations</button>
+            <button class="tab-btn" onclick="switchTab(event, 'decisions')">✅ Key Decisions</button>
+        </div>
+
+        <!-- TAB 1: MEETING AGENDA -->
+        <div id="agenda" class="tab-content active">
+            <div class="card pastel-blue">
+                <h2>📋 Meeting Agenda & Discussion Flow</h2>
+                <div class="section-intro">
+                    <strong>Objective:</strong> Align on business scope, data rules, optimization strategy, and dashboard requirements before technical implementation.
+                </div>
+
+                <h3>The 5-Part Agenda</h3>
+                <div class="agenda-grid">
+                    <div class="agenda-item">
+                        <div class="agenda-item-num">1</div>
+                        <h4>Understand Current Data</h4>
+                        <ul>
+                            <li>Review dataset structure & columns</li>
+                            <li>Discuss data quality & completeness</li>
+                            <li>Confirm 14 quarters of data coverage</li>
+                            <li>Identify any data concerns</li>
+                        </ul>
+                    </div>
+
+                    <div class="agenda-item">
+                        <div class="agenda-item-num">2</div>
+                        <h4>Define Business Objectives</h4>
+                        <ul>
+                            <li>Choose primary optimization target</li>
+                            <li>Identify secondary objectives</li>
+                            <li>Discuss trade-offs & constraints</li>
+                            <li>Align on success metrics</li>
+                        </ul>
+                    </div>
+
+                    <div class="agenda-item">
+                        <div class="agenda-item-num">3</div>
+                        <h4>Segment Strategy</h4>
+                        <ul>
+                            <li>Confirm 3 segments (Personal, Enterprise, Partner)</li>
+                            <li>Define segment-specific priorities</li>
+                            <li>Discuss pricing differences per segment</li>
+                            <li>Identify special handling rules</li>
+                        </ul>
+                    </div>
+
+                    <div class="agenda-item">
+                        <div class="agenda-item-num">4</div>
+                        <h4>Data Handling Rules</h4>
+                        <ul>
+                            <li>Finalize KPI calculation rules</li>
+                            <li>Handle missing/null values</li>
+                            <li>Manage returns & cancellations</li>
+                            <li>Confirm status filters</li>
+                        </ul>
+                    </div>
+
+                    <div class="agenda-item">
+                        <div class="agenda-item-num">5</div>
+                        <h4>Dashboard & Next Steps</h4>
+                        <ul>
+                            <li>List key views & features needed</li>
+                            <li>Define drill-down requirements</li>
+                            <li>Outline what-if capabilities</li>
+                            <li>Plan implementation timeline</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="key-points">
+                    <h4>⚠️ Critical Success Factor</h4>
+                    <ul>
+                        <li><strong>Don't jump to technical work without alignment.</strong> The most common failure is building the "wrong thing perfectly."</li>
+                        <li>This conversation prevents rework, confusion, and misaligned priorities later.</li>
+                        <li>Treat this as the business foundation - everything else depends on getting this right.</li>
+                    </ul>
+                </div>
+
+                <div class="decision-box">
+                    <h4>✅ Success = Team Agreement On:</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>✓ What problem we're solving</li>
+                        <li>✓ How we measure success</li>
+                        <li>✓ What data rules to follow</li>
+                        <li>✓ How to handle segments</li>
+                        <li>✓ What the dashboard should show</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DATA COLUMNS -->
+        <div id="columns" class="tab-content">
+            <div class="card pastel-blue">
+                <h2>📋 All Data Columns & Usage</h2>
+                <div class="section-intro">
+                    Based on EDA analysis of 14 quarters of Lenovo fiscal data. Understanding each column helps us know what we can analyze and what contributes to pricing.
+                </div>
+
+                <h3>Core Financial Metrics</h3>
+                <div class="column-grid">
+                    <div class="column-box">
+                        <div class="column-name">Revenue</div>
+                        <div class="column-type">Numeric (Currency)</div>
+                        <div class="column-usage">Price × Units. Base KPI for many analyses.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Order Units</div>
+                        <div class="column-type">Numeric (Integer)</div>
+                        <div class="column-usage">Quantity ordered. Volume indicator. Missing: use Invoice Qty substitute.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Invoice Quantity</div>
+                        <div class="column-type">Numeric (Integer)</div>
+                        <div class="column-usage">Invoiced quantity. Fill missing Order Units. ~5% missing data.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Cost</div>
+                        <div class="column-type">Numeric (Currency)</div>
+                        <div class="column-usage">Product COGS. Margin = Revenue - Cost. Essential for pricing.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Margin</div>
+                        <div class="column-type">Numeric (Currency)</div>
+                        <div class="column-usage">Revenue - Cost. Profit per transaction. Key optimization metric.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Tax</div>
+                        <div class="column-type">Numeric (Currency)</div>
+                        <div class="column-usage">~10% missing. Already in Revenue. Can be dropped.</div>
+                    </div>
+                </div>
+
+                <h3>Product Dimensions (Hierarchy)</h3>
+                <div class="column-grid">
+                    <div class="column-box">
+                        <div class="column-name">Product Name</div>
+                        <div class="column-type">Text (SKU)</div>
+                        <div class="column-usage">Individual product level. Finest granularity for pricing.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Product Line</div>
+                        <div class="column-type">Category</div>
+                        <div class="column-usage">Higher-level grouping. Use for portfolio analysis.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Product Family / Series</div>
+                        <div class="column-type">Category</div>
+                        <div class="column-usage">Mid-level cluster. Used for cannibalization analysis.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Product Category</div>
+                        <div class="column-type">Category</div>
+                        <div class="column-type">Highest level grouping</div>
+                        <div class="column-usage">Portfolio perspective. Strategic view.</div>
+                    </div>
+                </div>
+
+                <h3>Business Dimensions</h3>
+                <div class="column-grid">
+                    <div class="column-box">
+                        <div class="column-name">Segment</div>
+                        <div class="column-type">Category</div>
+                        <div class="column-usage">3 values: Personal, Enterprise, Partner. Each may have different pricing strategy.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Rep_Take_Role</div>
+                        <div class="column-type">Category</div>
+                        <div class="column-usage">Sales channel/method. Relevant if channels have different pricing.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Fiscal Quarter</div>
+                        <div class="column-type">Date (Quarterly)</div>
+                        <div class="column-usage">Time dimension. Note: Fiscal Q1 = April (different from calendar).</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Month</div>
+                        <div class="column-type">Date (Monthly)</div>
+                        <div class="column-usage">Granular time analysis. Reveals seasonality & trends.</div>
+                    </div>
+                </div>
+
+                <h3>Status & Transaction Fields</h3>
+                <div class="column-grid">
+                    <div class="column-box">
+                        <div class="column-name">Order Status</div>
+                        <div class="column-type">Category</div>
+                        <div class="column-usage"><strong>Use "Shipped" for KPI calculations.</strong> Exclude Draft/Pending.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Return Status</div>
+                        <div class="column-type">Yes/No</div>
+                        <div class="column-usage">Indicates if item was returned. Treat returns as next-quarter inventory.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Return Date</div>
+                        <div class="column-type">Date</div>
+                        <div class="column-usage">When return occurred. Missing = no return. Don't fill with zeros.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Cancellation Status</div>
+                        <div class="column-type">Yes/No</div>
+                        <div class="column-usage">Indicates if order was cancelled. Affects revenue calculation.</div>
+                    </div>
+                </div>
+
+                <h3>Supporting Fields</h3>
+                <div class="column-grid">
+                    <div class="column-box">
+                        <div class="column-name">Price Tier</div>
+                        <div class="column-type">Category</div>
+                        <div class="column-usage">Current price classification. Reference for understanding existing structure.</div>
+                    </div>
+
+                    <div class="column-box">
+                        <div class="column-name">Row ID (to add)</div>
+                        <div class="column-type">Numeric (Sequential)</div>
+                        <div class="column-usage">No unique ID exists in dataset. Add sequential ID for each transaction.</div>
+                    </div>
+                </div>
+
+                <div class="key-points">
+                    <h4>📌 Column Action Items</h4>
+                    <ul>
+                        <li>Confirm all columns above exist & understood</li>
+                        <li>Verify data quality for financial columns (Revenue, Cost, Margin)</li>
+                        <li>Confirm hierarchy structure: Product → Family → Line → Category</li>
+                        <li>Add sequential transaction ID if missing</li>
+                        <li>Agree on handling of ~5% missing Order Units & ~10% missing Tax</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: PRICE COMPONENTS -->
+        <div id="price" class="tab-content">
+            <div class="card pastel-pink">
+                <h2>💰 What Constitutes Price?</h2>
+                <div class="section-intro">
+                    Price is not a single number - it's built from multiple components. Understanding these helps us know what to optimize and what affects pricing decisions.
+                </div>
+
+                <h3>Six Price Components</h3>
+                <div class="price-components">
+                    <div class="price-comp-card">
+                        <div class="price-comp-icon">📍</div>
+                        <div class="price-comp-title">Base Price</div>
+                        <div class="price-comp-desc">List price at product level. Foundation for all decisions. Varies by product family.</div>
+                    </div>
+
+                    <div class="price-comp-card">
+                        <div class="price-comp-icon">📦</div>
+                        <div class="price-comp-title">Volume Adjustments</div>
+                        <div class="price-comp-desc">Bulk discounts or premiums. High-volume orders get better rates. Different by segment.</div>
+                    </div>
+
+                    <div class="price-comp-card">
+                        <div class="price-comp-icon">👥</div>
+                        <div class="price-comp-title">Segment Adjustments</div>
+                        <div class="price-comp-desc">Personal vs Enterprise vs Partner. Different commercial agreements. Reflects customer type.</div>
+                    </div>
+
+                    <div class="price-comp-card">
+                        <div class="price-comp-icon">⏰</div>
+                        <div class="price-comp-title">Temporal Adjustments</div>
+                        <div class="price-comp-desc">Promo pricing, end-of-quarter push, seasonal, inventory clearance urgency.</div>
+                    </div>
+
+                    <div class="price-comp-card">
+                        <div class="price-comp-icon">🔗</div>
+                        <div class="price-comp-title">Product Mix Effects</div>
+                        <div class="price-comp-desc">Bundle pricing, cross-product discounts. Watch cannibalization between product families.</div>
+                    </div>
+
+                    <div class="price-comp-card">
+                        <div class="price-comp-icon">🏆</div>
+                        <div class="price-comp-title">Customer Tier</div>
+                        <div class="price-comp-desc">Premium vs standard customers. Relationship/contract-based pricing. Long-term accounts.</div>
+                    </div>
+                </div>
+
+                <h3>How Price Flows Through the Data</h3>
+                <div class="trend-box">
+                    <div class="trend-title">🔢 The Basic Formula</div>
+                    <div class="trend-finding"><strong>Revenue per Transaction = (Base Price + Component Adjustments) × Units Ordered</strong></div>
+                    <div class="trend-finding">This means to optimize price, we need to understand how each component affects:</div>
+                    <div style="margin-top: 12px; padding-left: 20px;">
+                        <div class="trend-finding">→ Total Revenue generated</div>
+                        <div class="trend-finding">→ Profit Margin realized</div>
+                        <div class="trend-finding">→ Units actually sold</div>
+                        <div class="trend-finding">→ Customer satisfaction/returns</div>
+                    </div>
+                </div>
+
+                <h3>Price Calculation Examples</h3>
+                <div class="trend-box">
+                    <div class="trend-title">Example 1: Enterprise Segment High Volume</div>
+                    <div class="trend-finding">Base Price: $1,000 | Volume Discount: -10% | Segment Adjustment (Enterprise): -5% | Final Price: $855/unit</div>
+                    <div class="trend-finding" style="color: #8b6ba8;">Result: Lower margin per unit, but higher volume typically compensates</div>
+                </div>
+
+                <div class="trend-box">
+                    <div class="trend-title">Example 2: Personal Segment Single Unit</div>
+                    <div class="trend-finding">Base Price: $1,000 | Volume Adjustment: none | Segment Adjustment (Personal): +5% | Final Price: $1,050/unit</div>
+                    <div class="trend-finding" style="color: #8b6ba8;">Result: Higher margin, but lower volume from premium pricing</div>
+                </div>
+
+                <div class="trend-box">
+                    <div class="trend-title">Example 3: End-of-Quarter Clearance</div>
+                    <div class="trend-finding">Base Price: $1,000 | Temporal Adjustment (Clearance): -20% | Final Price: $800/unit</div>
+                    <div class="trend-finding" style="color: #8b6ba8;">Result: Move inventory, accept lower margin to clear stock</div>
+                </div>
+
+                <h3>Key Pricing Questions to Answer in Meeting</h3>
+                <div class="decision-box">
+                    <h4>❓ Confirm with Team:</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>✓ Which price components currently exist in business?</li>
+                        <li>✓ Are all 6 components used, or only some?</li>
+                        <li>✓ Who sets each component? (Finance, Sales, Product, etc.)</li>
+                        <li>✓ Are there rules/constraints on adjustments?</li>
+                        <li>✓ How often are prices updated?</li>
+                        <li>✓ What's the relationship between Revenue & Price in our data?</li>
+                    </ul>
+                </div>
+
+                <div class="key-points">
+                    <h4>💡 Why This Matters for Pricing Intelligence</h4>
+                    <ul>
+                        <li>We're not inventing pricing - we're optimizing what already exists</li>
+                        <li>Our model needs to understand current price structure to make recommendations</li>
+                        <li>Different components respond differently to optimization</li>
+                        <li>Segment-specific strategies require separate optimization rules</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: OPTIMIZATION TARGETS -->
+        <div id="optimize" class="tab-content">
+            <div class="card pastel-green">
+                <h2>🎯 What Should We Optimize For?</h2>
+                <div class="section-intro">
+                    The dashboard must support multiple optimization scenarios, not just one target. Different business situations require different objectives.
+                </div>
+
+                <h3>Five Core Optimization Scenarios</h3>
+
+                <div class="objective-cards">
+                    <div class="objective-card">
+                        <div class="objective-title">Scenario 1: Maximize Revenue</div>
+                        <div class="objective-item"><strong>Goal:</strong> Capture maximum total sales value</div>
+                        <div class="objective-item"><strong>When to use:</strong> Market expansion, high-volume growth priority</div>
+                        <div class="objective-item"><strong>Price approach:</strong> Lower prices to drive volume</div>
+                        <div class="objective-item"><strong>Risk:</strong> Margin compression, reduced profitability</div>
+                        <div class="objective-item"><strong>KPI:</strong> Total Revenue</div>
+                    </div>
+
+                    <div class="objective-card">
+                        <div class="objective-title">Scenario 2: Maximize Margin</div>
+                        <div class="objective-item"><strong>Goal:</strong> Capture highest profit per unit</div>
+                        <div class="objective-item"><strong>When to use:</strong> Profitability priority, lower volume acceptable</div>
+                        <div class="objective-item"><strong>Price approach:</strong> Higher prices for better margins</div>
+                        <div class="objective-item"><strong>Risk:</strong> Lower volume, lose market share</div>
+                        <div class="objective-item"><strong>KPI:</strong> Total Margin or Margin %</div>
+                    </div>
+
+                    <div class="objective-card">
+                        <div class="objective-title">Scenario 3: Maximize Units</div>
+                        <div class="objective-item"><strong>Goal:</strong> Sell maximum number of units</div>
+                        <div class="objective-item"><strong>When to use:</strong> Market penetration, building customer base</div>
+                        <div class="objective-item"><strong>Price approach:</strong> Aggressive pricing to maximize volume</div>
+                        <div class="objective-item"><strong>Risk:</strong> Extreme margin loss, commoditization</div>
+                        <div class="objective-item"><strong>KPI:</strong> Total Units Sold</div>
+                    </div>
+
+                    <div class="objective-card">
+                        <div class="objective-title">Scenario 4: Inventory Clearance</div>
+                        <div class="objective-item"><strong>Goal:</strong> Clear excess or end-of-life inventory</div>
+                        <div class="objective-item"><strong>When to use:</strong> Product discontinuation, warehouse capacity</div>
+                        <div class="objective-item"><strong>Price approach:</strong> Aggressive discounting to move stock</div>
+                        <div class="objective-item"><strong>Risk:</strong> Trains market to expect low prices</div>
+                        <div class="objective-item"><strong>KPI:</strong> Inventory Reduction Target</div>
+                    </div>
+
+                    <div class="objective-card">
+                        <div class="objective-title">Scenario 5: Balanced (Weighted)</div>
+                        <div class="objective-item"><strong>Goal:</strong> Balance multiple business priorities</div>
+                        <div class="objective-item"><strong>When to use:</strong> Multiple competing objectives matter</div>
+                        <div class="objective-item"><strong>Price approach:</strong> Weighted formula: w1×Rev + w2×Margin + w3×Units</div>
+                        <div class="objective-item"><strong>Advantage:</strong> Flexible, context-specific, testable</div>
+                        <div class="objective-item"><strong>KPI:</strong> Custom weighted score</div>
+                    </div>
+                </div>
+
+                <h3>Scenario Comparison: Pros & Cons</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h4>🔴 Maximize Revenue</h4>
+                        <div class="pro">Simple objective, easy to measure</div>
+                        <div class="pro">Good for growth phases</div>
+                        <div class="con">May destroy margins</div>
+                        <div class="con">Volume doesn't always follow</div>
+                    </div>
+
+                    <div class="comparison-card">
+                        <h4>🟢 Maximize Margin</h4>
+                        <div class="pro">Improves profitability</div>
+                        <div class="pro">Focuses on quality revenue</div>
+                        <div class="con">May leave volume on table</div>
+                        <div class="con">Risky if competition underprices</div>
+                    </div>
+
+                    <div class="comparison-card">
+                        <h4>🔵 Maximize Units</h4>
+                        <div class="pro">Build market share quickly</div>
+                        <div class="pro">Create switching costs</div>
+                        <div class="con">Severe margin impact</div>
+                        <div class="con">Unsustainable long-term</div>
+                    </div>
+
+                    <div class="comparison-card">
+                        <h4>🟡 Inventory Clearance</h4>
+                        <div class="pro">Solves immediate problem</div>
+                        <div class="pro">Frees up capital</div>
+                        <div class="con">Very low margins short-term</div>
+                        <div class="con">Market perception risk</div>
+                    </div>
+
+                    <div class="comparison-card">
+                        <h4>⚪ Balanced/Weighted</h4>
+                        <div class="pro">Reflects real-world complexity</div>
+                        <div class="pro">Context-specific, adjustable</div>
+                        <div class="con">More complex to implement</div>
+                        <div class="con">Requires defining weights</div>
+                    </div>
+                </div>
+
+                <h3>Recommended Approach: Flexible Optimization</h3>
+                <div class="decision-box">
+                    <h4>✅ Build the dashboard to support ALL scenarios</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>❶ Create pricing models for each scenario</li>
+                        <li>❷ Allow users to select objective OR input custom weights</li>
+                        <li>❸ Show trade-offs (e.g., "Max margin reduces volume by X%")</li>
+                        <li>❹ Enable what-if analysis for testing scenarios</li>
+                        <li>❺ Track results vs actual performance</li>
+                    </ul>
+                </div>
+
+                <h3>Critical Questions to Answer in Meeting</h3>
+                <div class="key-points">
+                    <h4>❓ Key Decisions Needed:</h4>
+                    <ul>
+                        <li>Which scenario is PRIMARY for your business?</li>
+                        <li>Are there secondary objectives that matter?</li>
+                        <li>Does this change by segment? (e.g., Enterprise = margin, Personal = volume)</li>
+                        <li>Does this change by product? (e.g., New product = volume, mature = margin)</li>
+                        <li>Are there hard constraints? (e.g., "never go below 20% margin")</li>
+                        <li>How often do objectives change?</li>
+                    </ul>
+                </div>
+
+                <div class="trend-box">
+                    <div class="trend-title">💡 Dashboard Design Implication</div>
+                    <div class="trend-finding">Don't hardcode one objective into the model. Build a Decision Matrix where users can:</div>
+                    <div style="margin-top: 12px; padding-left: 20px;">
+                        <div class="trend-finding">→ Select the scenario (or create custom weights)</div>
+                        <div class="trend-finding">→ See recommended prices for that objective</div>
+                        <div class="trend-finding">→ Understand trade-offs vs other scenarios</div>
+                        <div class="trend-finding">→ Compare to actual results over time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: TRENDS & CORRELATIONS -->
+        <div id="trends" class="tab-content">
+            <div class="card pastel-yellow">
+                <h2>📈 Key Trends & Correlations</h2>
+                <div class="section-intro">
+                    Understanding how metrics relate to each other helps us set realistic optimization targets and understand business dynamics.
+                </div>
+
+                <h3>Core Metric Relationships</h3>
+
+                <div class="trend-box">
+                    <div class="trend-title">📊 Revenue vs Units: Volume-Driven or Price-Driven?</div>
+                    <div class="trend-finding">
+                        <strong>What EDA shows:</strong> Analyze if revenue growth comes from more units sold or higher prices.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Decision Impact:</strong> If revenue is volume-driven, pricing down won't hurt. If price-driven, volume sensitivity matters.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Questions to answer:</strong> How does 10% price change affect units? What's the elasticity by product?
+                    </div>
+                </div>
+
+                <div class="trend-box">
+                    <div class="trend-title">💰 Revenue vs Margin: High Revenue ≠ High Profit</div>
+                    <div class="trend-finding">
+                        <strong>The Gap:</strong> Some products drive high revenue but lower margins (discounted to boost volume).
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Decision Impact:</strong> Can't optimize just revenue. Must consider cost structure & margins together.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Action:</strong> Create Revenue vs Margin scatter plot. Identify which quadrant each product is in.
+                    </div>
+                </div>
+
+                <div class="trend-box">
+                    <div class="trend-title">📉 Margin % by Product: Natural Variation</div>
+                    <div class="trend-finding">
+                        <strong>Typical finding:</strong> Different products have different natural margin %. Not all should target same margin.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Why?:</strong> Cost structure varies (premium vs budget products), market competition differs, customer segments vary.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Action:</strong> Benchmark margins by product family. Understand which are structurally high/low margin.
+                    </div>
+                </div>
+
+                <div class="trend-box">
+                    <div class="trend-title">⏰ Temporal Patterns: Seasonality & Trends</div>
+                    <div class="trend-finding">
+                        <strong>What to look for:</strong> Are there seasonal peaks? End-of-quarter surges? Holiday effects?
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Decision Impact:</strong> Pricing can differ by time. Clearance urgency varies by quarter.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Metrics to track:</strong> Revenue trend, margin trend, units trend - all by month and fiscal quarter.
+                    </div>
+                </div>
+
+                <div class="trend-box">
+                    <div class="trend-title">👥 Segment Differences: Personal vs Enterprise vs Partner</div>
+                    <div class="trend-finding">
+                        <strong>Expected finding:</strong> Each segment likely has different volume/margin profile.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Decision Impact:</strong> May require different pricing strategies per segment. Enterprise might want margin, Personal wants volume.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Action:</strong> Compare Revenue, Margin, Margin %, Units across segments. Note differences.
+                    </div>
+                </div>
+
+                <div class="trend-box">
+                    <div class="trend-title">📦 Product Mix: Returns & Cancellations Matter</div>
+                    <div class="trend-finding">
+                        <strong>Key insight:</strong> Reported revenue ≠ actual realized revenue if returns/cancellations high.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Decision Impact:</strong> High return rates reduce real profitability. May indicate pricing/product mismatch.
+                    </div>
+                    <div class="trend-finding">
+                        <strong>Metrics:</strong> Return rate by product, cancellation rate by segment - watch for outliers.
+                    </div>
+                </div>
+
+                <h3>Expected Analysis Outputs</h3>
+                <div class="data-prep">
+                    <div class="data-prep-title">Visualizations to Create:</div>
+                    <div class="data-prep-item">Revenue trend by fiscal quarter (14 quarters showing growth/decline)</div>
+                    <div class="data-prep-item">Margin trend by fiscal quarter (compare to revenue trend)</div>
+                    <div class="data-prep-item">Units sold trend (shows volume changes independent of revenue/margin)</div>
+                    <div class="data-prep-item">Correlation matrix (Revenue, Units, Cost, Margin - see relationships)</div>
+                    <div class="data-prep-item">Revenue vs Margin scatter (identify product quadrants)</div>
+                    <div class="data-prep-item">Performance by segment (compare Personal, Enterprise, Partner)</div>
+                    <div class="data-prep-item">Top products by revenue (show concentration)</div>
+                    <div class="data-prep-item">Return rate by product (quality/satisfaction indicator)</div>
+                    <div class="data-prep-item">Monthly seasonality (peaks and valleys)</div>
+                </div>
+
+                <h3>Key Metrics Table</h3>
+                <table class="metric-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Definition</th>
+                            <th>Why It Matters</th>
+                            <th>Affected By Price?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Revenue</strong></td>
+                            <td>Price × Units (Shipped)</td>
+                            <td>Top-line business performance</td>
+                            <td>🔴 Directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Units</strong></td>
+                            <td>Quantity shipped</td>
+                            <td>Volume driver, market penetration</td>
+                            <td>🟡 Indirectly (price elasticity)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cost</strong></td>
+                            <td>COGS + associated costs</td>
+                            <td>Determines profitability</td>
+                            <td>⚪ No (fixed by supply)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Margin</strong></td>
+                            <td>Revenue - Cost</td>
+                            <td>Absolute profit - KEY for optimization</td>
+                            <td>🔴 Directly via price</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Margin %</strong></td>
+                            <td>Margin / Revenue</td>
+                            <td>Profitability rate, efficiency</td>
+                            <td>🟡 Complex (both numerator & denominator)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Avg Price</strong></td>
+                            <td>Revenue / Units</td>
+                            <td>Effective price per unit</td>
+                            <td>🔴 This is what we optimize</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Return Rate</strong></td>
+                            <td>Returned / Total</td>
+                            <td>Product quality/satisfaction</td>
+                            <td>🟡 Maybe (high price = expectations)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="key-points">
+                    <h4>🎯 During Meeting: Review Charts Together</h4>
+                    <ul>
+                        <li>Walk through each trend visualization</li>
+                        <li>Discuss whether patterns match business expectations</li>
+                        <li>Identify any surprising findings or anomalies</li>
+                        <li>Connect findings to optimization strategy</li>
+                        <li>Note any data quality concerns for action</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: KEY DECISIONS -->
+        <div id="decisions" class="tab-content">
+            <div class="card">
+                <h2>✅ Key Decisions & Action Items</h2>
+                <div class="section-intro">
+                    Use this section during the meeting to capture decisions and assign ownership.
+                </div>
+
+                <h3>Section 1: Data & Scope Decisions</h3>
+                <div class="decision-box">
+                    <h4>❓ Decision 1: KPI Definition</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ Use "Shipped" status only for revenue/KPI calculations</li>
+                        <li>☐ Include/exclude Draft orders? Include/exclude Pending?</li>
+                        <li>☐ How to handle returns? (Revenue reduction OR inventory?)</li>
+                        <li>☐ How to handle cancellations? (Exclude from analysis?)</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Decision: ___________________________________</li>
+                        <li style="font-weight: 600;">Owner: ___________________________________</li>
+                    </ul>
+                </div>
+
+                <div class="decision-box">
+                    <h4>❓ Decision 2: Missing Data Handling</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ Order Units missing (~5%)? → Use Invoice Qty as substitute</li>
+                        <li>☐ Tax missing (~10%)? → Drop (already in Revenue)</li>
+                        <li>☐ Cost missing? → Proceed with available data OR request clarification?</li>
+                        <li>☐ Add sequential transaction ID to dataset</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Decision: ___________________________________</li>
+                        <li style="font-weight: 600;">Owner: ___________________________________</li>
+                    </ul>
+                </div>
+
+                <div class="decision-box">
+                    <h4>❓ Decision 3: Segment Handling</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ Confirm 3 segments: Personal, Enterprise, Partner</li>
+                        <li>☐ Build same model for all OR different model per segment?</li>
+                        <li>☐ If per-segment: Do objectives differ? (e.g., Enterprise = margin focus)</li>
+                        <li>☐ Special pricing rules per segment?</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Decision: ___________________________________</li>
+                        <li style="font-weight: 600;">Owner: ___________________________________</li>
+                    </ul>
+                </div>
+
+                <h3>Section 2: Optimization Strategy Decisions</h3>
+                <div class="decision-box">
+                    <h4>❓ Decision 4: Primary Objective</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ Maximize Revenue</li>
+                        <li>☐ Maximize Margin</li>
+                        <li>☐ Maximize Units</li>
+                        <li>☐ Inventory Clearance</li>
+                        <li>☐ Balanced (Weighted Combination)</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Primary Objective: ___________________________</li>
+                        <li style="font-weight: 600;">Why: ___________________________________</li>
+                    </ul>
+                </div>
+
+                <div class="decision-box">
+                    <h4>❓ Decision 5: Secondary Objectives</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ Any secondary objectives to balance?</li>
+                        <li>☐ Are there constraints? (e.g., never below 20% margin, never above $X)</li>
+                        <li>☐ Does objective change by product? By segment? By time period?</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Secondary Objectives: ___________________________</li>
+                        <li style="font-weight: 600;">Constraints: ___________________________________</li>
+                    </ul>
+                </div>
+
+                <div class="decision-box">
+                    <h4>❓ Decision 6: What-If Capability</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ Should users be able to test different objectives?</li>
+                        <li>☐ Should users be able to input custom weights?</li>
+                        <li>☐ Should dashboard show impact trade-offs?</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Decision: ___________________________________</li>
+                        <li style="font-weight: 600;">Owner: ___________________________________</li>
+                    </ul>
+                </div>
+
+                <h3>Section 3: Dashboard Design Decisions</h3>
+                <div class="decision-box">
+                    <h4>❓ Decision 7: Core Views Needed</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ KPI Dashboard (Revenue, Margin, Units, Margin %)</li>
+                        <li>☐ Product Performance (top products by revenue, margin, units)</li>
+                        <li>☐ Trend Analysis (over 14 quarters, monthly)</li>
+                        <li>☐ Segment Comparison (Personal vs Enterprise vs Partner)</li>
+                        <li>☐ Pricing Recommendation Engine (shows suggested prices)</li>
+                        <li>☐ What-If Simulator (test different objectives)</li>
+                        <li>☐ Cannibalization Risk View (product family overlap)</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Priority Views: ___________________________</li>
+                    </ul>
+                </div>
+
+                <div class="decision-box">
+                    <h4>❓ Decision 8: Drill-Down & Filters</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ Filter by Product / Product Line / Product Family?</li>
+                        <li>☐ Filter by Segment (Personal / Enterprise / Partner)?</li>
+                        <li>☐ Filter by Time Period (Fiscal Quarter / Month)?</li>
+                        <li>☐ Filter by Price Tier (current classification)?</li>
+                        <li>☐ Drill from Portfolio → Line → Family → Product?</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Must-Have Filters: ___________________________</li>
+                    </ul>
+                </div>
+
+                <div class="decision-box">
+                    <h4>❓ Decision 9: Pricing Display</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☐ Show current average price vs recommended price?</li>
+                        <li>☐ Show price range or single price recommendation?</li>
+                        <li>☐ Show confidence level / performance expectation?</li>
+                        <li>☐ Allow manual override of recommendations?</li>
+                        <li style="margin-top: 15px; font-weight: 600;">Decision: ___________________________________</li>
+                    </ul>
+                </div>
+
+                <h3>Section 4: Next Steps & Timeline</h3>
+                <div class="data-prep">
+                    <div class="data-prep-title">Phase 1: Data Preparation (Week 1-2)</div>
+                    <div class="data-prep-item">Clean data according to decisions (status filtering, missing value handling)</div>
+                    <div class="data-prep-item">Add sequential transaction ID</div>
+                    <div class="data-prep-item">Create derived metrics (Avg Price, Margin %, etc.)</div>
+                    <div class="data-prep-item">Validate against business team</div>
+                </div>
+
+                <div class="data-prep">
+                    <div class="data-prep-title">Phase 2: EDA & Analysis (Week 2-3)</div>
+                    <div class="data-prep-item">Generate trend visualizations (14 quarters)</div>
+                    <div class="data-prep-item">Correlation analysis (Revenue, Margin, Units)</div>
+                    <div class="data-prep-item">Product & segment performance analysis</div>
+                    <div class="data-prep-item">Present findings to team for feedback</div>
+                </div>
+
+                <div class="data-prep">
+                    <div class="data-prep-title">Phase 3: Model Building (Week 3-4)</div>
+                    <div class="data-prep-item">Build pricing model(s) per objective</div>
+                    <div class="data-prep-item">Test on historical data</div>
+                    <div class="data-prep-item">Calculate expected outcomes vs actuals</div>
+                    <div class="data-prep-item">Validate with business team</div>
+                </div>
+
+                <div class="data-prep">
+                    <div class="data-prep-title">Phase 4: Dashboard Build (Week 4+)</div>
+                    <div class="data-prep-item">Implement core visualizations</div>
+                    <div class="data-prep-item">Add interactive features (filters, drill-downs)</div>
+                    <div class="data-prep-item">Integrate pricing recommendations</div>
+                    <div class="data-prep-item">User testing & refinement</div>
+                </div>
+
+                <div class="decision-box">
+                    <h4>✅ Meeting Completion Checklist</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>☑ All 9 key decisions documented & assigned to owners</li>
+                        <li>☑ Business objective(s) clearly defined</li>
+                        <li>☑ Data rules agreed upon (status, missing values, etc.)</li>
+                        <li>☑ Segment strategy confirmed</li>
+                        <li>☑ Dashboard core views prioritized</li>
+                        <li>☑ Timeline agreed upon</li>
+                        <li>☑ Next step (Phase 1) assigned to owner with due date</li>
+                        <li style="margin-top: 15px; font-weight: 600; border-top: 2px solid #d4a5f8; padding-top: 15px;">Meeting Outcome: ALIGNED ✓</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>This is a working toolkit for business scope alignment. Customize and share with your team.</p>
+        <p>Use tabs to navigate through Meeting Agenda → Data Columns → Price Components → Optimization → Trends → Decisions</p>
+    </div>
+
+    <script>
+        function switchTab(evt, tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show the selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to the clicked button
+            evt.currentTarget.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const buttons = document.querySelectorAll('.tab-btn');
+            const current = Array.from(buttons).findIndex(btn => btn.classList.contains('active'));
+
+            if (e.key === 'ArrowRight' && current < buttons.length - 1) {
+                buttons[current + 1].click();
+            } else if (e.key === 'ArrowLeft' && current > 0) {
+                buttons[current - 1].click();
+            }
+        });
+    </script>
+</body>
+</html>

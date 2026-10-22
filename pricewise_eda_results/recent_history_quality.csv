@@ -1,0 +1,10 @@
+check,rows
+retained_history_rows,1067140
+missing_revenue_or_units,0
+nonpositive_units,0
+nonpositive_revenue,499412
+missing_family,363
+missing_price_tier,0
+margin_identity_mismatch,1974
+revenue_fields_differ,79285
+supplied_vs_derived_fiscal_mismatch,0
