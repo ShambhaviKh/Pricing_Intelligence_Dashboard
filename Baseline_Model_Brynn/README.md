@@ -1,97 +1,91 @@
-# Global Baseline Model (CA / US)
+# Global Baseline Price Model (CA / US)
 
-This directory contains global ASP baseline models for CA and US, trained on transaction data for the Top 30 products. The current version does not split the models by product family.
+This directory contains the leakage-free global baseline price model for the Top 30 products in Canada and the United States. CA and US are modeled separately; weights are shared across products within each country and are not split by product family.
+
+## Final Model
+
+The candidate blended formula was:
+
+```text
+Forward7DayASP = w30 × ProductASP30
+               + w90 × ProductASP90
+               + wf  × FamilyAdjustedPrice
+```
+
+where:
+
+```text
+FamilyAdjustedPrice = ProductASP90 × (PeerASP30 / PeerASP90)
+```
+
+Family peers exclude the target product. All features use data through the day before the scoring date, and the target is the unit-weighted ASP over the next seven calendar days.
+
+After two expanding-window validation folds, none of the blended candidates met the acceptance rule of improving over ASP30-only in both folds with at least 2% average improvement. The official baseline therefore falls back to:
+
+```text
+CA Price = 1.0000 × ASP30 + 0.0000 × ASP90 + 0.0000 × FamilyAdjustedPrice
+US Price = 1.0000 × ASP30 + 0.0000 × ASP90 + 0.0000 × FamilyAdjustedPrice
+```
+
+This `1/0/0` result is an intentional model-selection outcome, not a failed optimization. The additional signals did not provide sufficiently stable out-of-time improvement.
+
+## Validation Design
+
+- Fold 1: train through FY25Q4; validate on FY26Q1–FY26Q2.
+- Fold 2: train through FY26Q2; validate on FY26Q3–FY26Q4.
+- Final test: train through FY26Q4; evaluate on FY27Q1.
+- FY27Q2 is incomplete and is reported only as a shadow evaluation.
+
+The candidates were ASP30-only, ASP90-only, a fixed 50/30/20 blend, three constrained learned-weight objectives, and a dynamic shrinkage formula. Static weights were constrained to be nonnegative and sum to one.
+
+The selection metric was:
+
+```text
+Balanced MAE = 0.5 × unweighted MAE + 0.5 × unit-weighted MAE
+```
+
+This prevents high-volume observations from completely controlling the model while still reflecting business volume.
+
+## Rolling-Validation Result
+
+| Country | Selected model | Average validation balanced MAE | Best alternative | Alternative improvement | Decision |
+|---|---:|---:|---:|---:|---|
+| CA | ASP30-only | 126.08 | ASP30-only | 0.00% | Keep ASP30-only |
+| US | ASP30-only | 112.17 | Dynamic shrinkage | 1.28% | Reject: below 2% and not better in both folds |
+
+## Holdout Results
+
+| Country | Period | Eligible product-days | Balanced MAE | Unit-weighted MAE | R² |
+|---|---:|---:|---:|---:|---:|
+| CA | FY27Q1 test | 322 | 333.41 | 368.95 | 0.254 |
+| US | FY27Q1 test | 516 | 255.11 | 266.27 | 0.632 |
+| CA | FY27Q2 shadow | 1,004 | 131.76 | 102.21 | 0.793 |
+| US | FY27Q2 shadow | 1,011 | 130.19 | 102.60 | 0.899 |
+
+The weak CA FY27Q1 result is a material stability warning. That period contains only 322 eligible product-days and shows substantial temporal drift. The baseline should not be described as production-ready for CA without additional history, peer-universe expansion, and drift investigation.
+
+## Files
+
+- `weighted_asp_formula_baseline.ipynb`: corrected daily-panel construction, rolling validation, model selection, and final evaluation.
+- `global_baseline_model_CA_US.ipynb`: secondary machine-learning benchmark; it is not the official weighted-ASP baseline.
+- `artifacts/corrected_backtest_comparison.csv`: all candidate results by validation fold.
+- `artifacts/corrected_weight_stability.csv`: learned coefficients and dynamic parameters by fold.
+- `artifacts/corrected_model_selection.csv`: acceptance-gate results.
+- `artifacts/corrected_final_model_summary.csv`: FY27Q1 test and FY27Q2 shadow metrics.
+- `artifacts/corrected_final_predictions.csv`: product-day predictions.
+- `artifacts/corrected_model_conclusion.json`: machine-readable final conclusion.
 
 ## How to Run
 
-1. Open `weighted_asp_formula_baseline.ipynb` for the final weighted-ASP formula, or `global_baseline_model_CA_US.ipynb` for the machine-learning benchmark comparison.
-2. Run the selected notebook from top to bottom.
-3. Review the generated files in `artifacts/`, including the validation comparison, final test metrics, predictions, product-level metrics, and feature importance.
+1. Place the CA and US Top 30 transaction files in `Top 30 Product for US-CA/`.
+2. Open `weighted_asp_formula_baseline.ipynb`.
+3. Run all cells from top to bottom.
+4. Review the regenerated `corrected_*` files in `artifacts/`.
 
-The data is split chronologically into 70% training, 15% validation, and 15% testing rather than using a random split. The comparison includes a weighted-median benchmark, Ridge regression, Random Forest, and CatBoost with RMSE, MAE, Huber, and Quantile loss functions. Validation weighted MAE is the primary model-selection metric.
+## Limitations and Next Step
 
-## Final Weighted-ASP Price Formula
-
-The final directly usable baseline formula is:
-
-```text
-Predicted Price = w30 × ASP30 + w90 × ASP90 + wf × ASPf
-```
-
-The signals are defined as follows:
-
-- `ASP30`: the same product's trailing 30-day unit-weighted ASP.
-- `ASP90`: the same product's trailing 90-day unit-weighted ASP.
-- `ASPf`: the same product family's trailing 90-day unit-weighted ASP.
-
-All rolling values exclude the current day. The model uses one global set of weights per country and does not estimate separate weights by product family.
-
-The final weights, refitted on training plus validation data, are:
-
-```text
-CA Price = 0.7676 × ASP30 + 0.0000 × ASP90 + 0.2324 × ASPf
-US Price = 0.9130 × ASP30 + 0.0795 × ASP90 + 0.0075 × ASPf
-```
-
-| Country | Selected training loss | w30 | w90 | wf | Test weighted MAE | Test weighted WAPE | Test R² |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| CA | MSE | 0.7676 | 0.0000 | 0.2324 | 175.50 | 13.45% | 0.620 |
-| US | Huber | 0.9130 | 0.0795 | 0.0075 | 178.24 | 13.52% | 0.725 |
-
-The near-zero CA `w90` indicates that ASP90 did not provide additional validation value after ASP30 and ASPf were included. The US result is also dominated by ASP30, with smaller contributions from ASP90 and ASPf.
-
-## Weight-Estimation Objective
-
-Let `y_i` be the observed ASP, `ŷ_i = f(x_i)` be the predicted ASP, and
-
-```text
-s_i = clip(sqrt(order_units_i), 1, 5)
-```
-
-The three price weights satisfy:
-
-```text
-w30 >= 0, w90 >= 0, wf >= 0
-w30 + w90 + wf = 1
-```
-
-CA selected weighted MSE as the training objective:
-
-```text
-L_CA = sum_i s_i(y_i - ŷ_i)^2 / sum_i s_i
-```
-
-US selected weighted Huber loss with `delta = 100`:
-
-```text
-e_i = y_i - ŷ_i
-Huber(e_i) = 0.5e_i^2                         if |e_i| <= 100
-             100(|e_i| - 50)                 otherwise
-L_US = sum_i s_i Huber(e_i) / sum_i s_i
-```
-
-In these equations, `s_i = clip(sqrt(order_units_i), 1, 5)` is the observation weight and is different from the formula coefficients `w30`, `w90`, and `wf`.
-
-MAE, MSE, and Huber variants are compared on the validation period using weighted MAE:
-
-```text
-L_selection = sum_i s_i|y_i - ŷ_i| / sum_i s_i
-```
-
-The selected loss is refitted on training plus validation data. The test set is then used once for final evaluation and is not used to select the weights or loss function.
-
-## Machine-Learning Benchmark Results
-
-| Country | Recommended model | Test weighted MAE | Test weighted WAPE | Test R² |
-|---|---:|---:|---:|---:|
-| CA | CatBoost (RMSE loss) | 182.23 | 14.08% | 0.714 |
-| US | Random Forest | 216.22 | 16.37% | 0.742 |
-
-Larger orders receive more weight, while the maximum weight is capped at 5 to prevent unusually large orders from dominating model training.
-
-The leading feature importance values are:
-
-- CA: cost per unit 58.57%, time trend 10.00%, product type 9.64%, and product line 8.90%.
-- US: cost per unit 73.50%, product line 13.17%, product model 3.97%, and product type 2.56%.
-
-These values represent predictive feature importance, not causal coefficients. They should not be interpreted as the price change caused by changing a feature. This baseline predicts historically realized ASP and is not a price-elasticity model. Estimating price elasticity would require additional information such as rejected quotes, offer history, controlled price variation, or pricing experiments.
+- Family peers currently come only from the selected Top 30 products. The next meaningful improvement is to calculate peer signals from the full eligible product universe.
+- Products without sufficient product and peer history are excluded; production requires a cold-start fallback.
+- Family-specific or product-type weights should be introduced only after peer diagnostics and rolling-validation gates are passed.
+- The model predicts a defensible historical price baseline, not a causal or profit-maximizing price.
+- A true price optimizer requires offered prices, accepted and rejected quotes, promotions, inventory, competitor pricing, and demand-response data.

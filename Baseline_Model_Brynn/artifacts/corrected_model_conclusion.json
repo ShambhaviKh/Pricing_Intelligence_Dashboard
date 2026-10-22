@@ -1,0 +1,16 @@
+{
+  "CA": {
+    "selected_model": "ASP30_only",
+    "formula": "Price = 1.0000 \u00d7 ASP30 + 0.0000 \u00d7 ASP90 + 0.0000 \u00d7 FamilyAdjustedPrice",
+    "test_balanced_MAE": 333.41,
+    "test_unit_weighted_MAE": 368.95,
+    "test_R2": 0.2542
+  },
+  "US": {
+    "selected_model": "ASP30_only",
+    "formula": "Price = 1.0000 \u00d7 ASP30 + 0.0000 \u00d7 ASP90 + 0.0000 \u00d7 FamilyAdjustedPrice",
+    "test_balanced_MAE": 255.11,
+    "test_unit_weighted_MAE": 266.27,
+    "test_R2": 0.6321
+  }
+}
