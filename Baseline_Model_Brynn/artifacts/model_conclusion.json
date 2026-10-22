@@ -1,0 +1,38 @@
+{
+  "CA": {
+    "recommended_model": "CatBoost_RMSE",
+    "test_weighted_MAE": 182.23,
+    "test_weighted_RMSE": 298.02,
+    "test_weighted_WAPE": 0.1408,
+    "test_R2": 0.7138,
+    "sample_weight_formula": "clip(sqrt(order_units), 1, 5)",
+    "top_feature_weights_pct": {
+      "cost_per_unit": 58.57,
+      "days_since_start": 10.0,
+      "product_type": 9.64,
+      "product_line": 8.9,
+      "sales_channel": 2.59,
+      "month": 2.5,
+      "product_model": 1.96,
+      "document_category": 1.5
+    }
+  },
+  "US": {
+    "recommended_model": "Random_Forest",
+    "test_weighted_MAE": 216.22,
+    "test_weighted_RMSE": 321.86,
+    "test_weighted_WAPE": 0.1637,
+    "test_R2": 0.7417,
+    "sample_weight_formula": "clip(sqrt(order_units), 1, 5)",
+    "top_feature_weights_pct": {
+      "cost_per_unit": 73.5,
+      "product_line": 13.17,
+      "product_model": 3.97,
+      "product_type": 2.56,
+      "days_since_start": 2.06,
+      "sales_channel": 1.59,
+      "product_id": 0.98,
+      "month": 0.67
+    }
+  }
+}
