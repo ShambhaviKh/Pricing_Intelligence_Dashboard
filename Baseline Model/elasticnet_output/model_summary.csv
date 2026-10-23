@@ -1,0 +1,3 @@
+country,alpha,l1_ratio,training_product_days,intercept_original_units
+US,0.001,0.2,9585,-39.528284834101896
+CA,0.01,0.5,5161,-32.16696277857886
