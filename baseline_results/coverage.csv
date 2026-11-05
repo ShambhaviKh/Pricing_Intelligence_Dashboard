@@ -1,0 +1,4 @@
+stage,train_rows,candidate_rows,no_future_sales,missing_asp30,missing_peer90,compared_rows,compared_products,first_target_start,last_target_end,trailing_days_omitted
+Validation 1,2464,520,106,25,0,406,63,2026-02-01,2026-03-28,3
+Validation 2,2889,520,87,19,0,426,63,2026-04-01,2026-05-26,5
+Final holdout,3363,845,272,82,0,566,61,2026-06-01,2026-08-30,1

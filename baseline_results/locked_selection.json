@@ -1,0 +1,5 @@
+{
+  "ridge_alpha": 1000.0,
+  "validation_winner": "ASP30",
+  "selection_metric": "pooled validation MAE"
+}
