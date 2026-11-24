@@ -1,0 +1,26 @@
+seg_type,event,lift,lift_incl_price_effect,n_weeks,each_occurrence
+Enterprise / Desktop,Black Friday week,1.606,1.685,2,2023-11-20: 1.41; 2024-11-25: 1.82
+Enterprise / Desktop,Cyber Monday week,1.309,1.373,2,2023-11-27: 1.49; 2024-12-02: 1.15
+Enterprise / Desktop,Christmas week,0.926,0.948,2,2023-12-25: 1.04; 2024-12-23: 0.83
+Enterprise / Desktop,New Year week,0.59,0.605,2,2024-01-01: 0.60; 2024-12-30: 0.58
+Enterprise / Desktop,Fiscal quarter-end week (Jun/Sep/Mar),0.924,0.935,10,2023-03-27: 0.92; 2023-06-26: 1.17; 2023-09-25: 1.18; 2024-03-25: 0.73; 2024-06-24: 0.85; 2024-09-30: 1.06; 2025-03-31: 0.64; 2025-06-30: 0.88; 2026-03-30: 1.09; 2026-06-29: 0.88
+Enterprise / Notebook,Black Friday week,2.192,2.356,2,2023-11-20: 2.22; 2024-11-25: 2.17
+Enterprise / Notebook,Cyber Monday week,1.491,1.626,2,2023-11-27: 1.25; 2024-12-02: 1.78
+Enterprise / Notebook,Christmas week,1.037,1.026,2,2023-12-25: 1.19; 2024-12-23: 0.91
+Enterprise / Notebook,New Year week,0.799,0.835,2,2024-01-01: 0.85; 2024-12-30: 0.75
+Enterprise / Notebook,Fiscal quarter-end week (Jun/Sep/Mar),0.976,0.97,10,2023-03-27: 0.98; 2023-06-26: 1.19; 2023-09-25: 0.95; 2024-03-25: 0.83; 2024-06-24: 0.84; 2024-09-30: 1.14; 2025-03-31: 0.99; 2025-06-30: 0.94; 2026-03-30: 1.29; 2026-06-29: 0.75
+Enterprise / Workstations,Black Friday week,1.872,1.945,2,2023-11-20: 1.79; 2024-11-25: 1.95
+Enterprise / Workstations,Cyber Monday week,1.48,1.53,2,2023-11-27: 1.31; 2024-12-02: 1.68
+Enterprise / Workstations,Christmas week,0.881,0.811,2,2023-12-25: 0.91; 2024-12-23: 0.85
+Enterprise / Workstations,New Year week,0.727,0.718,2,2024-01-01: 0.81; 2024-12-30: 0.65
+Enterprise / Workstations,Fiscal quarter-end week (Jun/Sep/Mar),0.968,0.99,10,2023-03-27: 0.97; 2023-06-26: 1.00; 2023-09-25: 1.07; 2024-03-25: 0.79; 2024-06-24: 1.03; 2024-09-30: 0.96; 2025-03-31: 1.20; 2025-06-30: 0.80; 2026-03-30: 0.95; 2026-06-29: 0.98
+Personal / Desktop,Black Friday week,1.773,1.969,2,2023-11-20: 2.15; 2024-11-25: 1.46
+Personal / Desktop,Cyber Monday week,1.428,1.569,2,2023-11-27: 1.50; 2024-12-02: 1.36
+Personal / Desktop,Christmas week,1.348,1.327,2,2023-12-25: 1.55; 2024-12-23: 1.17
+Personal / Desktop,New Year week,1.428,1.658,2,2024-01-01: 1.38; 2024-12-30: 1.48
+Personal / Desktop,Fiscal quarter-end week (Jun/Sep/Mar),0.907,0.861,10,2023-03-27: 0.91; 2023-06-26: 1.46; 2023-09-25: 0.92; 2024-03-25: 0.88; 2024-06-24: 0.85; 2024-09-30: 1.06; 2025-03-31: 0.98; 2025-06-30: 0.62; 2026-03-30: 0.84; 2026-06-29: 0.76
+Personal / Notebook,Black Friday week,3.169,3.515,2,2023-11-20: 3.73; 2024-11-25: 2.69
+Personal / Notebook,Cyber Monday week,1.917,2.1,2,2023-11-27: 1.68; 2024-12-02: 2.18
+Personal / Notebook,Christmas week,1.659,1.632,2,2023-12-25: 1.90; 2024-12-23: 1.45
+Personal / Notebook,New Year week,0.95,0.989,2,2024-01-01: 1.01; 2024-12-30: 0.89
+Personal / Notebook,Fiscal quarter-end week (Jun/Sep/Mar),1.032,1.08,10,2023-03-27: 1.03; 2023-06-26: 1.00; 2023-09-25: 0.93; 2024-03-25: 0.95; 2024-06-24: 1.17; 2024-09-30: 0.94; 2025-03-31: 1.40; 2025-06-30: 0.96; 2026-03-30: 0.95; 2026-06-29: 1.07

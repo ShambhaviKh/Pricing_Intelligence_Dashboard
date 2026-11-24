@@ -1,0 +1,12 @@
+# Raw and converted Lenovo transaction data - never upload
+data/
+*.csv.gz
+*.parquet
+
+# Local environment / IDE / OS files
+.venv/
+.idea/
+__pycache__/
+*.pyc
+.DS_Store
+.tmp/

@@ -1,0 +1,93 @@
+{
+  "name": "Ridge_a10",
+  "cat_levels": {
+    "product_type": [
+      "Desktop",
+      "Notebook",
+      "Workstations"
+    ],
+    "segment": [
+      "Enterprise",
+      "Personal"
+    ],
+    "product_family": [
+      "Product Family Frame Road",
+      "Product Family Harbor Momentum",
+      "Product Family Knight Thrive",
+      "Product Family Lantern Orbit",
+      "Product Family Lima Line",
+      "Product Family Portal Bridge",
+      "Product Family Scale Vertex",
+      "Product Family Solar Peak",
+      "Product Family Stream Juliet",
+      "Product Family Terra Rose",
+      "Product Family Titan Onset",
+      "UNKNOWN"
+    ]
+  },
+  "kind": "sklearn_linear",
+  "country": "CA",
+  "currency": "CAD",
+  "target": "next order-week units-weighted realized ASP (local currency); y = log(ASP/anchor)",
+  "anchor_params": {
+    "k_h": 10,
+    "k_s": 10
+  },
+  "num_features": [
+    "r7",
+    "r30",
+    "r90",
+    "rlife",
+    "r_type",
+    "r_family",
+    "r_subfam",
+    "r_line",
+    "r_model",
+    "r_prior",
+    "log_anchor",
+    "lu7",
+    "lu30",
+    "lu90",
+    "ltx30",
+    "days_since_last",
+    "cv90",
+    "has7",
+    "has30",
+    "has90",
+    "has_life"
+  ],
+  "cat_features": [
+    "product_type",
+    "segment",
+    "product_family"
+  ],
+  "as_of": "2026-08-23",
+  "train_target_weeks": [
+    "2023-07-03",
+    "2026-08-17"
+  ],
+  "train_rows": 43731,
+  "validation": {
+    "val_wMAPE_mean": 0.09429371892313983,
+    "val_wMAPE_std": 0.007460158231564534,
+    "val_wMAPE_max": 0.10214899075983444,
+    "test_wMAPE": 0.11377400111604632,
+    "test_MdAPE": 0.08835907226210848
+  },
+  "selection": {
+    "best_by_validation": "LightGBM_L1",
+    "best_val_wMAPE": 0.09257288548467456,
+    "tolerance": 0.003,
+    "rule": "simplest model within tolerance of the best mean AND best worst-fold validation wMAPE"
+  },
+  "versions": {
+    "python": "3.10.12",
+    "sklearn": "1.7.2",
+    "lightgbm": "4.7.0",
+    "statsmodels": "0.15.0",
+    "pandas": "2.3.3",
+    "numpy": "2.2.6"
+  },
+  "created": "2026-11-22T17:49:59",
+  "usage": "from reference_model import predict_reference_price; see module docstring"
+}
