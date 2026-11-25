@@ -1,0 +1,81 @@
+market,feature,missing
+US,Units in last 7 days,37703
+US,Units in last 14 days,40454
+US,Units in last 28 days,45984
+US,Units in last 56 days,57122
+US,Log of 28-day units,45984
+US,Recent sales pace vs. typical pace,261452
+US,Recent pace minus preceding pace,45984
+US,Change from previous week,40454
+US,Four-week sales trend,45984
+US,Smoothed weekly sales,45984
+US,Weeks with recorded sales,57122
+US,Days since last recorded sale,110937
+US,Selling days in last 28 days,45984
+US,Invoice lines in last 28 days,45984
+US,Units per invoice line,261452
+US,Share of invoice lines with several units,261452
+US,Week-to-week sales variability,57122
+US,Variability relative to average sales,249129
+US,Share sold on the busiest day,261452
+US,Share of eight-week units sold in last two weeks,249129
+US,Fiscal month,0
+US,Fiscal quarter,0
+US,"Position in year, sine",0
+US,"Position in year, cosine",0
+US,Days until next relevant holiday,0
+US,Event week flag,0
+US,Family sales index in the same week last year,52759
+US,Recent change in family sales,58576
+US,Days since the SKU first recorded a sale,0
+US,SKU share of its family's units,46281
+US,Share sold through Direct,261452
+US,Share sold through Marketplace,261452
+US,Dependence on a small number of channels,261452
+US,Number of customer IDs,45984
+US,Share bought by the largest customer,261452
+US,Share bought by returning customers,263390
+US,Dependence on a few states or provinces,261452
+US,Change in Direct sales share,276136
+US,Sales rank within its family,45984
+US,SKU momentum relative to family,261452
+CA,Units in last 7 days,31482
+CA,Units in last 14 days,33794
+CA,Units in last 28 days,38461
+CA,Units in last 56 days,47845
+CA,Log of 28-day units,38461
+CA,Recent sales pace vs. typical pace,224749
+CA,Recent pace minus preceding pace,38461
+CA,Change from previous week,33794
+CA,Four-week sales trend,38461
+CA,Smoothed weekly sales,38461
+CA,Weeks with recorded sales,47845
+CA,Days since last recorded sale,95376
+CA,Selling days in last 28 days,38461
+CA,Invoice lines in last 28 days,38461
+CA,Units per invoice line,224749
+CA,Share of invoice lines with several units,224749
+CA,Week-to-week sales variability,47845
+CA,Variability relative to average sales,211509
+CA,Share sold on the busiest day,224749
+CA,Share of eight-week units sold in last two weeks,211509
+CA,Fiscal month,0
+CA,Fiscal quarter,0
+CA,"Position in year, sine",0
+CA,"Position in year, cosine",0
+CA,Days until next relevant holiday,0
+CA,Event week flag,0
+CA,Family sales index in the same week last year,44019
+CA,Recent change in family sales,49033
+CA,Days since the SKU first recorded a sale,0
+CA,SKU share of its family's units,39067
+CA,Share sold through Direct,224749
+CA,Share sold through Marketplace,224749
+CA,Dependence on a small number of channels,224749
+CA,Number of customer IDs,38461
+CA,Share bought by the largest customer,224749
+CA,Share bought by returning customers,225883
+CA,Dependence on a few states or provinces,224749
+CA,Change in Direct sales share,238558
+CA,Sales rank within its family,38461
+CA,SKU momentum relative to family,224749
